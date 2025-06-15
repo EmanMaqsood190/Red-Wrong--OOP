@@ -292,65 +292,78 @@ public:
 };
 
 // Main function
-int main() {
-    Display display;
-    display.clearScreenWithTitle();
 
-    cout << "Welcome to the Number Guessing Game, Now roam around the numbers from 1 to 100!\n";
-    cout << "Choose mode:\n1. Single Player\n2. Multiplayer\nEnter choice: ";
-    int modeChoice;
-    cin >> modeChoice;
-    cin.ignore();
+       int main() {
+    
+    char playAgain;
 
-    cout << "Choose difficulty level:\n1. Easy (7 attempts)\n2. Medium (5 attempts)\n3. Hard (3 attempts)\nEnter choice: ";
-    int diffChoice;
-    cin >> diffChoice;
-    cin.ignore();
+    do {
+        Display display;
+        display.clearScreenWithTitle();
 
-    Difficulty difficulty;
-    difficulty.setLevel(diffChoice);
+        cout << "Welcome to the Number Guessing Game, Now roam around the numbers from 1 to 100!\n";
+        cout << "Choose mode:\n1. Single Player\n2. Multiplayer\nEnter choice: ";
+        int modeChoice;
+        cin >> modeChoice;
+        cin.ignore();
 
-    int secretNumber = SecretNumberGenerator::generate();
+        cout << "Choose difficulty level:\n1. Easy (7 attempts)\n2. Medium (5 attempts)\n3. Hard (3 attempts)\nEnter choice: ";
+        int diffChoice;
+        cin >> diffChoice;
+        cin.ignore();
 
-    if (modeChoice == 1) {
-        string playerName;
-        cout << "Enter your name: ";
-        getline(cin, playerName);
+        Difficulty difficulty;
+        difficulty.setLevel(diffChoice);
 
-        Player player(playerName);
-        GameLogic game(secretNumber, difficulty);
+        int secretNumber = SecretNumberGenerator::generate();
 
-        for (int attempt = 1; attempt <= difficulty.getMaxAttempts(); ++attempt) {
-            if (game.playTurn(player, attempt)) {
-                break; // player won
+        if (modeChoice == 1) {
+            string playerName;
+            cout << "Enter your name: ";
+            getline(cin, playerName);
+
+            Player player(playerName);
+            GameLogic game(secretNumber, difficulty);
+
+            for (int attempt = 1; attempt <= difficulty.getMaxAttempts(); ++attempt) {
+                if (game.playTurn(player, attempt)) {
+                    break; // player won
+                }
             }
+
+            cout << "\nGame Over! Secret number was " << secretNumber << ".\n";
+            cout << player.getName() << "'s score: " << player.getScore() << endl;
+        } else if (modeChoice == 2) {
+            string p1Name, p2Name;
+            cout << "Enter Player 1 name: ";
+            cin.ignore(); // To handle leftover newline
+            getline(cin, p1Name);
+            cout << "Enter Player 2 name: ";
+            getline(cin, p2Name);
+
+            Player player1(p1Name);
+            Player player2(p2Name);
+            GameLogic game(secretNumber, difficulty);
+            WinnerDeterminer winnerDeterminer;
+
+            for (int attempt = 1; attempt <= difficulty.getMaxAttempts(); ++attempt) {
+                if (game.playTurn(player1, attempt)) break;
+                if (game.playTurn(player2, attempt)) break;
+            }
+
+            winnerDeterminer.determineWinner(player1, player2, secretNumber);
+        } else {
+            cout << "Invalid mode choice.\n";
         }
 
-        cout << "\nGame Over! Secret number was " << secretNumber << ".\n";
-        cout << player.getName() << "'s score: " << player.getScore() << endl;
-    } else if (modeChoice == 2) {
-        string p1Name, p2Name;
-        cout << "Enter Player 1 name: ";
-        getline(cin, p1Name);
-        cout << "Enter Player 2 name: ";
-        getline(cin, p2Name);
+        cout << "Thank you for playing!\n";
+        cout << "\nDo you want to play again? (Y/N): ";
+        cin >> playAgain;
 
-        Player player1(p1Name);
-        Player player2(p2Name);
-        GameLogic game(secretNumber, difficulty);
-        WinnerDeterminer winnerDeterminer;
+    } while (playAgain == 'Y' || playAgain == 'y');
 
-        for (int attempt = 1; attempt <= difficulty.getMaxAttempts(); ++attempt) {
-            if (game.playTurn(player1, attempt)) break;
-            if (game.playTurn(player2, attempt)) break;
-        }
-
-        winnerDeterminer.determineWinner(player1, player2, secretNumber);
-    } else {
-        cout << "Invalid mode choice.\n";
-    }
-
-    cout << "Thank you for playing!\n";
+    cout << "\nPress any key to exit...";
+    while (!kbhit()) {}
+    getch();
     return 0;
 }
-
