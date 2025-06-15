@@ -48,13 +48,20 @@ public:
         #endif
     }
 
-    void shakeEffect() {
-        setTextColor(12); // Red
-        cout << "\n\n\t\tWRONG GUESS!\n\n";
-        setTextColor(7);
-        Delay::wait(0.5);
-        cout << "\n";
+   void shakeEffect() {
+    setTextColor(12); // Red
+
+    const string message = "WRONG GUESS!";
+    for (int i = 0; i < 6; i++) {
+        // Move cursor back to start of line and print with varying indentation
+        cout << "\r" << string((i % 2 == 0) ? 10 : 12, ' ') << message << flush;
+        Delay::wait(0.1);
     }
+
+    cout << "\n"; // Move to next line
+    setTextColor(7); // Reset to default
+}
+
 
     void wrongGuessBuzzer() {
         setTextColor(12);
